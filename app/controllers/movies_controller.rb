@@ -7,12 +7,43 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.all_ratings
-    if params[:ratings] == nil
-      params[:ratings] = @all_ratings
+    redirect = false    
+    order_by = params[:order_by]
+    
+    if order_by.nil?
+      order_by = session[:order_by]
+      redirect = ! order_by.nil?
+    else
+      session[:order_by] = order_by
     end
-    @ratings_to_show = params[:ratings]
-    @movies = Movie.with_ratings(@ratings_to_show)
+    
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show = @all_ratings
+    
+    if not params[:ratings].nil?
+      @ratings_to_show = params[:ratings].keys
+      session[:ratings] = @ratings_to_show
+    elsif not session[:ratings].nil?
+      @ratings_to_show = session[:ratings]      
+      redirect = true
+    end
+    
+    if order_by == "title"
+      @title_header_class = 'hilite'
+      @sort_order = { title: :asc }
+      
+    elsif order_by == "date"
+      @date_header_class = 'hilite'
+      @sort_order = { release_date: :asc }
+    end
+    
+    if redirect
+      ratings_hash = {}
+      @ratings_to_show.each { |key| ratings_hash[key] = 1 }
+      redirect_to order_by: order_by, ratings: ratings_hash
+    else
+      @movies = Movie.where(rating: @ratings_to_show).order(@sort_order)
+    end
   end
 
   def new

@@ -2,7 +2,7 @@
 <h2>All Movies</h2>
 
 <%#  Part 1: Start here... %>
-
+<%flash[:notice] = @ratings_to_show %>
 <%= form_tag movies_path, method: :get, id: 'ratings_form' do %>
   Include:
   <% @all_ratings.each do |rating| %>
@@ -17,9 +17,25 @@
 <table class="table table-striped col-md-12" id="movies">
   <thead>
     <tr>
-      <th>Movie Title</th>
+      <th class="<%= @title_header_class %>">
+        <% if @sort_order == { title: :asc }%>
+        <div class="p-3 mb-2 bg-warning text-dark">
+          <%= link_to 'Movie Title', movies_path(order_by: 'title'), id: 'title_header' %>
+        </div>
+        <% else %>
+        <%= link_to 'Movie Title', movies_path(order_by: 'title'), id: 'title_header' %>
+        <%end%>
+      </th>
       <th>Rating</th>
-      <th>Release Date</th>
+      <th class="<%= @title_header_class %>">
+        <% if @sort_order == { release_date: :asc }%>
+        <div class="p-3 mb-2 bg-warning text-dark">
+          <%= link_to 'Release Date', movies_path(order_by: 'date'), id: 'release_date_header' %>
+        </div>
+        <% else %>
+        <%= link_to 'Release Date', movies_path(order_by: 'date'), id: 'release_date_header' %>
+        <%end%>
+      </th>
       <th>More Info</th>
     </tr>
   </thead>
